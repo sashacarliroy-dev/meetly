@@ -299,6 +299,39 @@ document.documentElement.setAttribute("data-theme",t);})();
   .price-wrap{display:flex; align-items:center; gap:6px; background:var(--mist); border-radius:10px; padding:0 17px;}
   .price-wrap input{background:none; border:none; padding:14px 0; font-size:14.5px; outline:none; flex:1;}
   .minmax-hint{font-size:12px; color:var(--slate); margin-top:8px; line-height:1.4;}
+  /* légende des badges */
+  .badge-legend{margin:0 0 18px; background:var(--paper); border:1px solid var(--mist); border-radius:14px; padding:0 16px;}
+  .badge-legend summary{cursor:pointer; list-style:none; padding:12px 0; font-weight:700; font-size:13.5px; color:var(--ink); display:flex; align-items:center; gap:8px;}
+  .badge-legend summary::-webkit-details-marker{display:none;}
+  .badge-legend summary::after{content:"+"; margin-left:auto; font-size:18px; color:var(--slate);}
+  .badge-legend[open] summary::after{content:"–";}
+  .badge-legend-row{display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-top:1px solid var(--mist); font-size:13px; color:var(--ink2); line-height:1.45;}
+  .badge-legend-row .pill{flex-shrink:0;}
+  .badge-legend-row:last-child{padding-bottom:14px;}
+  /* phrase délai */
+  .deadline-box{margin-top:14px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.08); color:#E4E5EE; font-size:13.5px; line-height:1.5;}
+  /* joueurs en phrase */
+  .players-sentence{font-family:'Space Grotesk'; font-weight:700; font-size:17px; color:var(--ink); margin:2px 0 4px;}
+  .players-row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:10px;}
+  .players-row label{font-size:12.5px !important; color:var(--slate) !important;}
+  /* étapes du formulaire */
+  .steps-bar{display:flex; gap:6px; margin:4px 0 6px;}
+  .steps-bar div{flex:1; height:5px; border-radius:4px; background:var(--mist);}
+  .steps-bar div.on{background:var(--court);}
+  .steps-label{font-size:12.5px; color:var(--slate); font-weight:700; margin-bottom:22px;}
+  .steps-label b{color:var(--ink); font-size:15px; display:block; margin-top:2px; font-family:'Space Grotesk';}
+  .steps-nav{display:flex; gap:10px; margin-top:8px;}
+  .steps-nav .btn{flex:1;}
+  /* compteur accueil */
+  .done-counter{display:inline-flex; align-items:center; gap:8px; margin-top:16px; font-size:13.5px; font-weight:700; color:var(--ink2);}
+  .done-counter b{font-family:'Space Grotesk'; font-size:17px; color:var(--ink);}
+  /* sports des notifications */
+  .notif-sports{margin:20px 0 6px; background:var(--paper); border:1px solid var(--mist); border-radius:16px; padding:16px;}
+  .notif-sports-title{font-weight:700; font-size:14.5px; color:var(--ink);}
+  .notif-sports-sub{font-size:12.5px; color:var(--slate); margin:3px 0 12px;}
+  .notif-sports-chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .notif-chip{border:1.5px solid var(--mist); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 14px; font-weight:700; font-size:13px; cursor:pointer;}
+  .notif-chip.on{background:#F5A623; border-color:#F5A623; color:#14162B;}
   .picker-scroll{display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch;}
   .picker-chip{flex-shrink:0; background:var(--mist); border:none; color:var(--ink2); font-weight:700; font-size:13px; padding:10px 16px; border-radius:999px; cursor:pointer; white-space:nowrap;}
   .picker-chip.sel{background:var(--deep); color:var(--court);}
@@ -797,6 +830,153 @@ const STR = {
     changePhoto:"Cambiar foto", changeCover:"Cambiar portada", saveBtn:"Guardar", profileSaved:"Perfil actualizado",
   },
 };
+/* ---- textes ajoutés (légende, délai, joueurs, étapes, compteur, sports des notifs) ---- */
+Object.assign(STR.fr, {
+  legendTitle:"Que veulent dire les badges ?",
+  legendNeeded:"Il manque encore des joueurs pour que l'activité ait lieu.",
+  legendConfirmed:"Assez de joueurs : l'activité a lieu. Il peut rester des places.",
+  legendFull:"Toutes les places sont prises.",
+  legendExpired:"Le minimum n'a pas été atteint à temps : on ne peut plus rejoindre.",
+  legendNew:"Publiée il y a moins de 24 h.",
+  deadlineSentence:(min,when)=>`Il faut au moins ${min} joueurs avant le ${when}. Sinon, l'activité se ferme et plus personne ne peut la rejoindre.`,
+  deadlineOk:(min)=>`Le minimum de ${min} joueurs est atteint : l'activité a bien lieu.`,
+  confirmByHint:"Si le minimum de joueurs n'est pas atteint à cette date, l'activité se ferme. Sans choix, c'est l'heure de l'activité.",
+  confirmByQuestion:"Jusqu'à quand attendre les joueurs ?",
+  playersQuestion:"Combien de joueurs, toi compris ?",
+  playersSentence:(min,max)=> min===max ? `Il faut ${max} joueurs.` : `Il faut entre ${min} et ${max} joueurs.`,
+  playersSub:(min,max)=> min===max ? `L'activité a lieu quand les ${max} places sont prises.` : `L'activité a lieu dès ${min} joueurs, jusqu'à ${max} places.`,
+  atLeast:"Au moins", atMost:"Au plus",
+  stepOf:(n)=>`Étape ${n} sur 3`, step1Title:"L'activité", step2Title:"Quand et où", step3Title:"Le groupe",
+  nextBtn:"Suivant", prevBtn:"Retour",
+  doneCounter:(n)=>`groupes complétés sur Meetly`,
+  notifSportsTitle:"🔔 Nouvelles activités : quels sports ?",
+  notifSportsSub:"Tu ne seras prévenu que pour les sports choisis.",
+  notifSportsSaved:"Préférences enregistrées",
+  notifSportsNone:"Aucun sport choisi : tu ne recevras plus d'alerte de nouvelle activité.",
+  notifSportsUnavailable:"Bientôt disponible",
+});
+Object.assign(STR.en, {
+  legendTitle:"What do the badges mean?",
+  legendNeeded:"More players are needed for the activity to happen.",
+  legendConfirmed:"Enough players: it's happening. Spots may still be open.",
+  legendFull:"All spots are taken.",
+  legendExpired:"The minimum wasn't reached in time: it can't be joined anymore.",
+  legendNew:"Posted less than 24 h ago.",
+  deadlineSentence:(min,when)=>`At least ${min} players are needed before ${when}. Otherwise the activity closes and nobody can join.`,
+  deadlineOk:(min)=>`The minimum of ${min} players is reached: it's happening.`,
+  confirmByHint:"If the minimum isn't reached by this time, the activity closes. If you don't pick, it's the activity's start time.",
+  confirmByQuestion:"How long to wait for players?",
+  playersQuestion:"How many players, you included?",
+  playersSentence:(min,max)=> min===max ? `You need ${max} players.` : `You need between ${min} and ${max} players.`,
+  playersSub:(min,max)=> min===max ? `It happens once all ${max} spots are taken.` : `It happens from ${min} players, up to ${max} spots.`,
+  atLeast:"At least", atMost:"At most",
+  stepOf:(n)=>`Step ${n} of 3`, step1Title:"The activity", step2Title:"When and where", step3Title:"The group",
+  nextBtn:"Next", prevBtn:"Back",
+  doneCounter:(n)=>`groups completed on Meetly`,
+  notifSportsTitle:"🔔 New activities: which sports?",
+  notifSportsSub:"You'll only be notified for the sports you pick.",
+  notifSportsSaved:"Preferences saved",
+  notifSportsNone:"No sport selected: you won't get new-activity alerts anymore.",
+  notifSportsUnavailable:"Coming soon",
+});
+Object.assign(STR.es, {
+  legendTitle:"¿Qué significan las etiquetas?",
+  legendNeeded:"Faltan jugadores para que la actividad se haga.",
+  legendConfirmed:"Hay suficientes jugadores: se hace. Puede quedar sitio.",
+  legendFull:"Todas las plazas están ocupadas.",
+  legendExpired:"No se alcanzó el mínimo a tiempo: ya no se puede unir.",
+  legendNew:"Publicada hace menos de 24 h.",
+  deadlineSentence:(min,when)=>`Hacen falta al menos ${min} jugadores antes del ${when}. Si no, la actividad se cierra y nadie puede unirse.`,
+  deadlineOk:(min)=>`Se alcanzó el mínimo de ${min} jugadores: la actividad se hace.`,
+  confirmByHint:"Si no se alcanza el mínimo en esta fecha, la actividad se cierra. Si no eliges, es la hora de la actividad.",
+  confirmByQuestion:"¿Hasta cuándo esperar jugadores?",
+  playersQuestion:"¿Cuántos jugadores, tú incluido?",
+  playersSentence:(min,max)=> min===max ? `Hacen falta ${max} jugadores.` : `Hacen falta entre ${min} y ${max} jugadores.`,
+  playersSub:(min,max)=> min===max ? `Se hace cuando las ${max} plazas estén ocupadas.` : `Se hace desde ${min} jugadores, hasta ${max} plazas.`,
+  atLeast:"Al menos", atMost:"Como máximo",
+  stepOf:(n)=>`Paso ${n} de 3`, step1Title:"La actividad", step2Title:"Cuándo y dónde", step3Title:"El grupo",
+  nextBtn:"Siguiente", prevBtn:"Atrás",
+  doneCounter:(n)=>`grupos completados en Meetly`,
+  notifSportsTitle:"🔔 Nuevas actividades: ¿qué deportes?",
+  notifSportsSub:"Solo recibirás avisos de los deportes elegidos.",
+  notifSportsSaved:"Preferencias guardadas",
+  notifSportsNone:"Ningún deporte elegido: ya no recibirás avisos de nuevas actividades.",
+  notifSportsUnavailable:"Próximamente",
+});
+
+/* ---- helpers ajoutés ---- */
+function badgeLegendHTML(){
+  return `<details class="badge-legend">
+    <summary>ℹ️ ${esc(t('legendTitle'))}</summary>
+    <div class="badge-legend-row">${pill(t('neededToConfirm', 2),"var(--coral)","var(--paper)")}<span>${esc(t('legendNeeded'))}</span></div>
+    <div class="badge-legend-row">${pill(t('confirmedBadge'),"var(--court)","var(--ink)")}<span>${esc(t('legendConfirmed'))}</span></div>
+    <div class="badge-legend-row">${pill(t('badgeFull'),"var(--ink)","var(--paper)")}<span>${esc(t('legendFull'))}</span></div>
+    <div class="badge-legend-row">${pill(t('badgeExpired'),"var(--slate)","var(--paper)")}<span>${esc(t('legendExpired'))}</span></div>
+    <div class="badge-legend-row">${pill(t('badgeNew'),"var(--mist2)","var(--ink2)")}<span>${esc(t('legendNew'))}</span></div>
+  </details>`;
+}
+function playersBlockHTML(f, minFn, needFn){
+  return `<div class="field">
+    <label>${esc(t('playersQuestion'))}</label>
+    <div class="players-sentence">${esc(t('playersSentence', f.min, f.need))}</div>
+    <div class="minmax-hint" style="margin-top:0;">${esc(t('playersSub', f.min, f.need))}</div>
+    <div class="players-row">
+      <div><label>${esc(t('atLeast'))}</label><div class="stepper"><button type="button" onclick="${minFn}(-1)">–</button><span>${f.min}</span><button type="button" onclick="${minFn}(1)">+</button></div></div>
+      <div><label>${esc(t('atMost'))}</label><div class="stepper"><button type="button" onclick="${needFn}(-1)">–</button><span>${f.need}</span><button type="button" onclick="${needFn}(1)">+</button></div></div>
+    </div>
+  </div>`;
+}
+function completedGroupsCount(){
+  return activities.filter(a => a.current >= (a.min||a.max)).length;
+}
+function createStepValid(step){
+  const f = state.createForm;
+  if(step===1) return !!(f.category && f.name);
+  if(step===2) return !!(f.date && f.time && f.location);
+  return !!(f.category&&f.name&&f.date&&f.time&&f.location);
+}
+function createGoStep(n){
+  if(n > (state.createStep||1) && !createStepValid(state.createStep||1)) return;
+  state.createStep = n; render(); window.scrollTo(0,0);
+}
+function notifSportsList(){
+  const v = state.user && state.user.notifSports;
+  return Array.isArray(v) ? v : PICK_CATEGORIES.map(c=>c.id); // pas de choix = tous les sports
+}
+async function toggleNotifSport(id){
+  if(!state.user) return;
+  const cur = notifSportsList();
+  const next = cur.includes(id) ? cur.filter(x=>x!==id) : cur.concat(id);
+  const { error } = await sb.from("profiles").update({ notif_sports: next }).eq("id", state.user.id);
+  if(error){ console.error(error); showToast(t('notifSportsUnavailable')); return; }
+  state.user.notifSports = next;
+  showToast(next.length ? t('notifSportsSaved') : t('notifSportsNone'));
+  render();
+}
+function notifSportsHTML(){
+  if(!state.user || state.notifSportsColumn === false) return "";
+  const sel = notifSportsList();
+  return `<div class="notif-sports">
+    <div class="notif-sports-title">${esc(t('notifSportsTitle'))}</div>
+    <div class="notif-sports-sub">${esc(t('notifSportsSub'))}</div>
+    <div class="notif-sports-chips">${PICK_CATEGORIES.map(c=>`<button type="button" class="notif-chip ${sel.includes(c.id)?'on':''}" onclick="toggleNotifSport('${c.id}')">${c.emoji} ${esc(catLabel(c.id))}</button>`).join("")}</div>
+  </div>`;
+}
+/* Prévenir d'une nouvelle activité seulement ceux qui suivent ce sport.
+   Si la colonne notif_sports n'existe pas encore dans Supabase, on garde l'envoi à tous. */
+async function notifyNewActivity(category, name){
+  const title = "Meetly 🎉", body = `${t('newActivityToast')} — ${name}`, url = window.location.href.split("#")[0];
+  try {
+    const { data, error } = await sb.from("profiles").select("id, notif_sports");
+    if(error || !data || data.length <= 1) throw error || new Error("profiles not readable");
+    const key = MAIN_CATS.includes(category) ? category : "other";
+    const ids = data.filter(p => p.id !== state.user.id && (!Array.isArray(p.notif_sports) || p.notif_sports.includes(key))).map(p=>p.id);
+    if(ids.length) await sendPushTo(ids, title, body, url);
+  } catch(e){
+    sendPushBroadcast(title, body, url, state.user.id);
+  }
+}
+
 function t(key, ...args){
   const dict = STR[state.lang] || STR.en;
   const val = dict[key] !== undefined ? dict[key] : STR.en[key];
@@ -1174,7 +1354,9 @@ async function onAuthed(authUser){
     bio: (profile && profile.bio) || "",
     avatar: (profile && profile.avatar_url) || avatarFor(authUser.id, (profile && profile.name) || authUser.email),
     cover: (profile && profile.cover_url) || "",
+    notifSports: (profile && Array.isArray(profile.notif_sports)) ? profile.notif_sports : null,
   };
+  state.notifSportsColumn = !!(profile && Object.prototype.hasOwnProperty.call(profile, "notif_sports"));
   await loadActivities();
   render();
 }
@@ -1476,6 +1658,7 @@ function pageHome(){
         <button class="btn btn-primary" onclick="go('explore')">${esc(t('btnFindActivity'))} ${ICON.arrowRight}</button>
         <button class="btn btn-secondary" onclick="go('create')">${esc(t('btnCreateActivity'))}</button>
       </div>
+      ${completedGroupsCount() >= 3 ? `<div class="done-counter">✅ <b>${completedGroupsCount()}</b> ${esc(t('doneCounter', completedGroupsCount()))}</div>` : ""}
     </div>
     <div class="hero-visual photo-content">
       <div class="hero-blob"></div>
@@ -1544,6 +1727,7 @@ function pageExplore(){
     <div class="cat-scroll">
       ${catsRow.map(c=>`<button class="cat-chip ${state.cat===c.id?'active':''}" onclick="setCat('${c.id}')">${c.emoji?c.emoji+" ":""}${c.id==='all'?esc(t('catAll')):esc(catLabel(c.id))}</button>`).join("")}
     </div>
+    ${badgeLegendHTML()}
     <div id="explore-results">${exploreResultsHTML()}</div>
   </div>`;
 }
@@ -1565,16 +1749,11 @@ function pageCreate(){
     </div>`;
   }
   const f = state.createForm;
-  return `
-  <div class="form-wrap">
-    <div class="page-banner">
-      ${photoRotatorHTML("linear-gradient(100deg, rgba(20,22,43,0.80), rgba(20,22,43,0.55))", "25%")}
-      <div class="photo-content">
-        <h1 class="fd" style="font-size:2.2rem;">${esc(t('createTitle'))}</h1>
-        <p style="margin:6px 0 0;">${esc(t('createSub'))}</p>
-      </div>
-    </div>
-
+  const step = state.createStep || 1;
+  const stepTitle = [t('step1Title'), t('step2Title'), t('step3Title')][step-1];
+  let body = "";
+  if(step===1){
+    body = `
     <div class="field">
       <label>${esc(t('whatDoing'))}</label>
       <div class="cat-picker">
@@ -1582,7 +1761,9 @@ function pageCreate(){
       </div>
     </div>
     <div class="field"><label>${esc(t('activityNameLabel'))}</label><input placeholder="${esc(t('activityNamePlaceholder'))}" value="${esc(f.name)}" oninput="setFormField('name',this.value)"></div>
-    ${levelPickerHTML(f.level, "setFormField")}
+    ${levelPickerHTML(f.level, "setFormField")}`;
+  } else if(step===2){
+    body = `
     <div class="field">
       <label>${esc(t('dateLabel'))}</label>
       ${dayScrollerHTML(dayOptions(14), f.date, "selectFormDate")}
@@ -1595,30 +1776,39 @@ function pageCreate(){
         <input type="time" value="${esc(f.time)}" oninput="setFormField('time',this.value)">
       </div>
     </div>
-    <div class="field"><label>${esc(t('whereLabel'))}</label><input placeholder="${esc(t('wherePlaceholder'))}" value="${esc(f.location)}" oninput="setFormField('location',this.value)"></div>
-    <div class="field field-row">
-      <div><label>${esc(t('minLabel'))}</label>
-        <div class="stepper">
-          <button onclick="stepMin(-1)">–</button><span>${f.min}</span><button onclick="stepMin(1)">+</button>
-        </div>
-      </div>
-      <div><label>${esc(t('maxLabel'))}</label>
-        <div class="stepper">
-          <button onclick="stepNeed(-1)">–</button><span>${f.need}</span><button onclick="stepNeed(1)">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="minmax-hint">${esc(t('minMaxHint'))}</div>
+    <div class="field"><label>${esc(t('whereLabel'))}</label><input placeholder="${esc(t('wherePlaceholder'))}" value="${esc(f.location)}" oninput="setFormField('location',this.value)"></div>`;
+  } else {
+    body = `
+    ${playersBlockHTML(f, "stepMin", "stepNeed")}
     <div class="field" style="margin-top:22px;">
-      <label>${esc(t('confirmByLabel'))}</label>
+      <label>${esc(t('confirmByQuestion'))}</label>
+      <div class="minmax-hint" style="margin:0 0 10px;">${esc(t('confirmByHint'))}</div>
       ${dayScrollerHTML(dayOptions(14), f.confirmByDate, "selectConfirmByDate")}
       <div style="margin-top:8px;">${timeScrollerHTML(timeOptions(), f.confirmByTime, "selectConfirmByTime")}</div>
     </div>
     <div class="field"><label>${esc(t('priceLabel'))}</label>
       <div class="price-wrap">${ICON.euro}<input placeholder="0" value="${esc(f.price)}" oninput="setFormField('price',this.value)"></div>
     </div>
-    <div class="field"><label>${esc(t('descriptionLabel'))}</label><textarea rows="3" placeholder="${esc(t('descriptionPlaceholder'))}" oninput="setFormField('description',this.value)">${esc(f.description)}</textarea></div>
-    <button class="btn btn-primary btn-full" id="create-submit-btn" ${!(f.category&&f.name&&f.date&&f.time&&f.location)?"disabled":""} onclick="submitCreate()">${esc(t('createActivityBtn'))}</button>
+    <div class="field"><label>${esc(t('descriptionLabel'))}</label><textarea rows="3" placeholder="${esc(t('descriptionPlaceholder'))}" oninput="setFormField('description',this.value)">${esc(f.description)}</textarea></div>`;
+  }
+  return `
+  <div class="form-wrap">
+    <div class="page-banner">
+      ${photoRotatorHTML("linear-gradient(100deg, rgba(20,22,43,0.80), rgba(20,22,43,0.55))", "25%")}
+      <div class="photo-content">
+        <h1 class="fd" style="font-size:2.2rem;">${esc(t('createTitle'))}</h1>
+        <p style="margin:6px 0 0;">${esc(t('createSub'))}</p>
+      </div>
+    </div>
+    <div class="steps-bar">${[1,2,3].map(n=>`<div class="${n<=step?'on':''}"></div>`).join("")}</div>
+    <div class="steps-label">${esc(t('stepOf', step))}<b>${esc(stepTitle)}</b></div>
+    ${body}
+    <div class="steps-nav">
+      ${step>1 ? `<button class="btn btn-secondary" onclick="createGoStep(${step-1})">${esc(t('prevBtn'))}</button>` : ""}
+      ${step<3
+        ? `<button class="btn btn-primary" id="create-submit-btn" ${!createStepValid(step)?"disabled":""} onclick="createGoStep(${step+1})">${esc(t('nextBtn'))} ${ICON.arrowRight}</button>`
+        : `<button class="btn btn-primary" id="create-submit-btn" ${!createStepValid(3)?"disabled":""} onclick="submitCreate()">${esc(t('createActivityBtn'))}</button>`}
+    </div>
   </div>`;
 }
 
@@ -1646,7 +1836,9 @@ function pageDetail(){
         <span>${ICON.euro} ${a.price>0?a.price+" "+t('perPerson'):t('free')}</span>
         ${a.level?`<span>🎯 ${esc(levelName(a.level))}</span>`:""}
       </div>
-      <div class="confirmby-row" style="color:#B9BBCB;">🗓️ ${esc(t('confirmByLabel'))}: ${confirmByDatePart?esc(fmtDateLabel(confirmByDatePart)):esc(aDate(a))}${confirmByTimePart?" · "+esc(confirmByTimePart):""}</div>
+      <div class="deadline-box">⏳ ${(confirmed||full)
+        ? esc(t('deadlineOk', min))
+        : esc(t('deadlineSentence', min, (confirmByDatePart?fmtDateLabel(confirmByDatePart):aDate(a)) + (confirmByTimePart?" · "+confirmByTimePart:"")))}</div>
       ${a.price>0 ? `<div class="payinfo-row" style="color:#8a8ca0;">💶 ${esc(t('payInPerson'))}</div>` : ""}
     </div>
     <div class="detail-grid">
@@ -1661,6 +1853,7 @@ function pageDetail(){
           </div>
           <div class="progress-labels"><span>${t('ofMin', a.current, min)}</span><span>${a.max} max</span></div>
         </div>
+        <div class="minmax-hint">${esc(t('playersSentence', min, a.max))}</div>
       </div>
       <div class="detail-box">
         <div class="detail-box-label">${esc(t('aboutLabel'))}</div>
@@ -1735,16 +1928,10 @@ function pageEditActivity(){
       </div>
     </div>
     <div class="field"><label>${esc(t('whereLabel'))}</label><input placeholder="${esc(t('wherePlaceholder'))}" value="${esc(f.location)}" oninput="setEditFormField('location',this.value)"></div>
-    <div class="field field-row">
-      <div><label>${esc(t('minLabel'))}</label>
-        <div class="stepper"><button onclick="stepEditMin(-1)">–</button><span>${f.min}</span><button onclick="stepEditMin(1)">+</button></div>
-      </div>
-      <div><label>${esc(t('maxLabel'))}</label>
-        <div class="stepper"><button onclick="stepEditNeed(-1)">–</button><span>${f.need}</span><button onclick="stepEditNeed(1)">+</button></div>
-      </div>
-    </div>
+    ${playersBlockHTML(f, "stepEditMin", "stepEditNeed")}
     <div class="field" style="margin-top:22px;">
-      <label>${esc(t('confirmByLabel'))}</label>
+      <label>${esc(t('confirmByQuestion'))}</label>
+      <div class="minmax-hint" style="margin:0 0 10px;">${esc(t('confirmByHint'))}</div>
       ${dayScrollerHTML(dayOptions(14), f.confirmByDate, "selectEditConfirmByDate")}
       <div style="margin-top:8px;">${timeScrollerHTML(timeOptions(), f.confirmByTime, "selectEditConfirmByTime")}</div>
     </div>
@@ -2230,6 +2417,7 @@ function pageProfile(){
         ${state.notifStatus === "denied" ? `<div style="font-size:11.5px; color:#F0B4AE; margin-top:8px;">${esc(t('notifBlockedHint'))}</div>` : ""}
       </div>
     </div>
+    ${notifSportsHTML()}
     <div class="profile-stats">
       <div class="pstat"><div class="pstat-num">${hostedCount+joinedCount}</div><div class="pstat-label">${esc(t('statsActivities'))}</div></div>
       <div class="pstat"><div class="pstat-num">${hostedCount}</div><div class="pstat-label">${esc(t('hostingPill'))}</div></div>
@@ -2464,7 +2652,7 @@ function setFormField(k,v){
   state.createForm[k]=v;
   if(k==="category"){ render(); return; }
   const btn = document.getElementById('create-submit-btn');
-  if(btn){ const f=state.createForm; btn.disabled = !(f.category&&f.name&&f.date&&f.time&&f.location); }
+  if(btn){ btn.disabled = !createStepValid(state.createStep||1); }
 }
 function selectFormDate(v){ setFormField('date', v); render(); }
 function selectFormTime(v){ setFormField('time', v); render(); }
@@ -2501,11 +2689,12 @@ async function submitCreate(){
   }
   const { error: joinErr } = await sb.from("participants").insert({ activity_id:data.id, user_id: state.user.id });
   if(joinErr) console.error(joinErr);
-  sendPushBroadcast("Meetly 🎉", `${t('newActivityToast')} — ${f.name}`, window.location.href.split("#")[0], state.user.id);
+  notifyNewActivity(f.category, f.name);
   await loadActivities();
   state.createdConfirmation = activities.find(a=>a.id===data.id) || null;
   setTimeout(() => burstConfetti(), 250);
   state.createForm = {category:"", name:"", date:"", time:"", location:"", need:4, min:4, confirmByDate:"", confirmByTime:"", price:"", description:"", level:"all"};
+  state.createStep = 1;
   render();
 }
 function startEditActivity(id){
