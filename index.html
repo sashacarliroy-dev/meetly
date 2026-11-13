@@ -842,7 +842,9 @@ Object.assign(STR.fr, {
   deadlineOk:(min)=>`Le minimum de ${min} joueurs est atteint : l'activité a bien lieu.`,
   confirmByHint:"Si le minimum de joueurs n'est pas atteint à cette date, l'activité se ferme. Sans choix, c'est l'heure de l'activité.",
   confirmByQuestion:"Jusqu'à quand attendre les joueurs ?",
-  playersQuestion:"Combien de joueurs, toi compris ?",
+  playersQuestion:"Combien de joueurs te manque-t-il ? (sans te compter)",
+  playersMissing:(a,b)=> a===b ? `Il te manque ${b} joueur${b>1?"s":""}.` : `Il te manque entre ${a} et ${b} joueurs.`,
+  playersWithYou:(mn,mx)=> mn===mx ? `Avec toi, vous serez ${mx}.` : `Avec toi, vous serez entre ${mn} et ${mx}. L'activité a lieu dès que ${mn-1} joueur${mn-1>1?"s":""} t'${mn-1>1?"ont":"a"} rejoint.`,
   playersSentence:(min,max)=> min===max ? `Il faut ${max} joueurs.` : `Il faut entre ${min} et ${max} joueurs.`,
   playersSub:(min,max)=> min===max ? `L'activité a lieu quand les ${max} places sont prises.` : `L'activité a lieu dès ${min} joueurs, jusqu'à ${max} places.`,
   atLeast:"Au moins", atMost:"Au plus",
@@ -866,7 +868,9 @@ Object.assign(STR.en, {
   deadlineOk:(min)=>`The minimum of ${min} players is reached: it's happening.`,
   confirmByHint:"If the minimum isn't reached by this time, the activity closes. If you don't pick, it's the activity's start time.",
   confirmByQuestion:"How long to wait for players?",
-  playersQuestion:"How many players, you included?",
+  playersQuestion:"How many players are you missing? (not counting you)",
+  playersMissing:(a,b)=> a===b ? `You're missing ${b} player${b>1?"s":""}.` : `You're missing between ${a} and ${b} players.`,
+  playersWithYou:(mn,mx)=> mn===mx ? `With you, that's ${mx}.` : `With you, that's ${mn} to ${mx}. It happens once ${mn-1} player${mn-1>1?"s":""} join${mn-1>1?"":"s"} you.`,
   playersSentence:(min,max)=> min===max ? `You need ${max} players.` : `You need between ${min} and ${max} players.`,
   playersSub:(min,max)=> min===max ? `It happens once all ${max} spots are taken.` : `It happens from ${min} players, up to ${max} spots.`,
   atLeast:"At least", atMost:"At most",
@@ -890,7 +894,9 @@ Object.assign(STR.es, {
   deadlineOk:(min)=>`Se alcanzó el mínimo de ${min} jugadores: la actividad se hace.`,
   confirmByHint:"Si no se alcanza el mínimo en esta fecha, la actividad se cierra. Si no eliges, es la hora de la actividad.",
   confirmByQuestion:"¿Hasta cuándo esperar jugadores?",
-  playersQuestion:"¿Cuántos jugadores, tú incluido?",
+  playersQuestion:"¿Cuántos jugadores te faltan? (sin contarte)",
+  playersMissing:(a,b)=> a===b ? `Te falta${b>1?"n":""} ${b} jugador${b>1?"es":""}.` : `Te faltan entre ${a} y ${b} jugadores.`,
+  playersWithYou:(mn,mx)=> mn===mx ? `Contigo, seréis ${mx}.` : `Contigo, seréis entre ${mn} y ${mx}. Se hace en cuanto se te ${mn-1>1?"unan":"una"} ${mn-1} jugador${mn-1>1?"es":""}.`,
   playersSentence:(min,max)=> min===max ? `Hacen falta ${max} jugadores.` : `Hacen falta entre ${min} y ${max} jugadores.`,
   playersSub:(min,max)=> min===max ? `Se hace cuando las ${max} plazas estén ocupadas.` : `Se hace desde ${min} jugadores, hasta ${max} plazas.`,
   atLeast:"Al menos", atMost:"Como máximo",
@@ -918,11 +924,11 @@ function badgeLegendHTML(){
 function playersBlockHTML(f, minFn, needFn){
   return `<div class="field">
     <label>${esc(t('playersQuestion'))}</label>
-    <div class="players-sentence">${esc(t('playersSentence', f.min, f.need))}</div>
-    <div class="minmax-hint" style="margin-top:0;">${esc(t('playersSub', f.min, f.need))}</div>
+    <div class="players-sentence">${esc(t('playersMissing', f.min-1, f.need-1))}</div>
+    <div class="minmax-hint" style="margin-top:0;">${esc(t('playersWithYou', f.min, f.need))}</div>
     <div class="players-row">
-      <div><label>${esc(t('atLeast'))}</label><div class="stepper"><button type="button" onclick="${minFn}(-1)">–</button><span>${f.min}</span><button type="button" onclick="${minFn}(1)">+</button></div></div>
-      <div><label>${esc(t('atMost'))}</label><div class="stepper"><button type="button" onclick="${needFn}(-1)">–</button><span>${f.need}</span><button type="button" onclick="${needFn}(1)">+</button></div></div>
+      <div><label>${esc(t('atLeast'))}</label><div class="stepper"><button type="button" onclick="${minFn}(-1)">–</button><span>${f.min-1}</span><button type="button" onclick="${minFn}(1)">+</button></div></div>
+      <div><label>${esc(t('atMost'))}</label><div class="stepper"><button type="button" onclick="${needFn}(-1)">–</button><span>${f.need-1}</span><button type="button" onclick="${needFn}(1)">+</button></div></div>
     </div>
   </div>`;
 }
