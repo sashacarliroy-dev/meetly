@@ -330,6 +330,10 @@ document.documentElement.setAttribute("data-theme",t);})();
   .notif-sports-title{font-weight:700; font-size:14.5px; color:var(--ink);}
   .notif-sports-sub{font-size:12.5px; color:var(--slate); margin:3px 0 12px;}
   .notif-sports-chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .my-level{margin-top:20px;}
+  .my-level + .notif-sports{margin-top:12px;}
+  .level-hint{font-size:13px; color:var(--ink2); background:var(--court-soft); border-radius:12px; padding:10px 14px; margin:4px 0 10px;}
+  .level-hint-link{cursor:pointer;}
   .notif-chip{border:1.5px solid var(--mist); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 14px; font-weight:700; font-size:13px; cursor:pointer;}
   .notif-chip.on{background:#F5A623; border-color:#F5A623; color:#14162B;}
   .picker-scroll{display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch;}
@@ -856,6 +860,13 @@ Object.assign(STR.fr, {
   notifSportsSaved:"Préférences enregistrées",
   notifSportsNone:"Aucun sport choisi : tu ne recevras plus d'alerte de nouvelle activité.",
   notifSportsUnavailable:"Bientôt disponible",
+  myLevelTitle:"🎯 Ton niveau",
+  myLevelSub:"Les activités de ton niveau passent en premier dans Explorer.",
+  myLevelSaved:"Niveau enregistré",
+  myLevelCleared:"Niveau retiré",
+  myLevelBadge:"Ton niveau",
+  myLevelSortHint:"🎯 Activités de ton niveau en premier",
+  myLevelSetHint:"🎯 Indique ton niveau dans ton profil pour voir d'abord les activités faites pour toi.",
 });
 Object.assign(STR.en, {
   legendTitle:"What do the badges mean?",
@@ -882,6 +893,13 @@ Object.assign(STR.en, {
   notifSportsSaved:"Preferences saved",
   notifSportsNone:"No sport selected: you won't get new-activity alerts anymore.",
   notifSportsUnavailable:"Coming soon",
+  myLevelTitle:"🎯 Your level",
+  myLevelSub:"Activities at your level show up first in Explore.",
+  myLevelSaved:"Level saved",
+  myLevelCleared:"Level removed",
+  myLevelBadge:"Your level",
+  myLevelSortHint:"🎯 Activities at your level first",
+  myLevelSetHint:"🎯 Set your level in your profile to see the activities that suit you first.",
 });
 Object.assign(STR.es, {
   legendTitle:"¿Qué significan las etiquetas?",
@@ -908,6 +926,13 @@ Object.assign(STR.es, {
   notifSportsSaved:"Preferencias guardadas",
   notifSportsNone:"Ningún deporte elegido: ya no recibirás avisos de nuevas actividades.",
   notifSportsUnavailable:"Próximamente",
+  myLevelTitle:"🎯 Tu nivel",
+  myLevelSub:"Las actividades de tu nivel aparecen primero en Explorar.",
+  myLevelSaved:"Nivel guardado",
+  myLevelCleared:"Nivel eliminado",
+  myLevelBadge:"Tu nivel",
+  myLevelSortHint:"🎯 Actividades de tu nivel primero",
+  myLevelSetHint:"🎯 Indica tu nivel en tu perfil para ver primero las actividades hechas para ti.",
 });
 
 /* ---- helpers ajoutés ---- */
@@ -966,6 +991,36 @@ function notifSportsHTML(){
     <div class="notif-sports-title">${esc(t('notifSportsTitle'))}</div>
     <div class="notif-sports-sub">${esc(t('notifSportsSub'))}</div>
     <div class="notif-sports-chips">${PICK_CATEGORIES.map(c=>`<button type="button" class="notif-chip ${sel.includes(c.id)?'on':''}" onclick="toggleNotifSport('${c.id}')">${c.emoji} ${esc(catLabel(c.id))}</button>`).join("")}</div>
+  </div>`;
+}
+/* ---------- Niveau de l'utilisateur (Profil) ----------
+   Enregistré dans profiles.level si la colonne existe, sinon gardé sur l'appareil (localStorage). */
+const USER_LEVELS = ["beginner","intermediate","advanced"];
+function myLevelKey(){ return "meetly_level_" + (state.user ? state.user.id : ""); }
+function localMyLevel(){ try { return localStorage.getItem(myLevelKey()) || null; } catch(e){ return null; } }
+function myLevel(){
+  const l = state.user && state.user.level;
+  return USER_LEVELS.includes(l) ? l : null;
+}
+async function setMyLevel(l){
+  if(!state.user) return;
+  const next = (myLevel() === l) ? null : l; // re-toucher le même niveau le retire
+  state.user.level = next;
+  try { if(next) localStorage.setItem(myLevelKey(), next); else localStorage.removeItem(myLevelKey()); } catch(e){}
+  showToast(next ? t('myLevelSaved') : t('myLevelCleared'));
+  render();
+  if(sbReady && state.levelColumn !== false){
+    const { error } = await sb.from("profiles").update({ level: next }).eq("id", state.user.id);
+    if(error){ console.warn("profiles.level indisponible, niveau gardé sur l'appareil", error); state.levelColumn = false; }
+  }
+}
+function myLevelHTML(){
+  if(!state.user) return "";
+  const cur = myLevel();
+  return `<div class="notif-sports my-level">
+    <div class="notif-sports-title">${esc(t('myLevelTitle'))}</div>
+    <div class="notif-sports-sub">${esc(t('myLevelSub'))}</div>
+    <div class="notif-sports-chips">${USER_LEVELS.map(l=>`<button type="button" class="notif-chip ${cur===l?'on':''}" onclick="setMyLevel('${l}')">${esc(levelName(l))}</button>`).join("")}</div>
   </div>`;
 }
 /* Prévenir d'une nouvelle activité seulement ceux qui suivent ce sport.
@@ -1125,7 +1180,7 @@ const LEVELS = ["all","beginner","intermediate","advanced"];
 function levelName(l){ return t('level_' + (LEVELS.includes(l) ? l : "all")); }
 function levelPickerHTML(current, setterFn){
   if(!LEVEL_COL) return "";
-  return `<div class="field"><label>${esc(t('levelLabel'))}</label><div class="picker-scroll">${LEVELS.map(l=>`<button type="button" class="picker-chip ${(current||"all")===l?'sel':''}" onclick="${setterFn}('level','${l}'); render();">${esc(levelName(l))}</button>`).join("")}</div></div>`;
+  return `<div class="field"><label>${esc(t('levelLabel'))}</label><div class="picker-scroll" style="flex-wrap:wrap; overflow:visible;">${LEVELS.map(l=>`<button type="button" class="picker-chip ${(current||"all")===l?'sel':''}" onclick="${setterFn}('level','${l}'); render();">${esc(levelName(l))}</button>`).join("")}</div></div>`;
 }
 async function saveActivityRow(kind, payload, id){
   // Enregistre avec le niveau ; si la colonne n'existe pas encore, réessaie sans
@@ -1394,6 +1449,8 @@ async function onAuthed(authUser){
     notifSports: (profile && Array.isArray(profile.notif_sports)) ? profile.notif_sports : null,
   };
   state.notifSportsColumn = !!(profile && Object.prototype.hasOwnProperty.call(profile, "notif_sports"));
+  state.levelColumn = !!(profile && Object.prototype.hasOwnProperty.call(profile, "level"));
+  state.user.level = (profile && USER_LEVELS.includes(profile.level)) ? profile.level : localMyLevel();
   await loadActivities();
   render();
 }
@@ -1660,6 +1717,7 @@ function getBadges(a){
   const isNew = a.createdAt && (Date.now() - new Date(a.createdAt).getTime()) < 86400000;
   if(isNew) out.push(pill(t('badgeNew'),"var(--mist2)","var(--ink2)"));
   if(a.popular && !full) out.push(pill(t('badgePopular'),"var(--court-soft)","#B5710A"));
+  if(!expired && a.level && state.user && myLevel() && a.level === myLevel()) out.push(pill("🎯 " + t('myLevelBadge'),"var(--court)","var(--ink)"));
   return out.join("");
 }
 function spotsText(a){
@@ -1792,9 +1850,20 @@ function exploreFiltered(){
     return true;
   });
 }
+function levelScore(a, lvl){
+  if(!lvl || !a.level) return 1;
+  if(a.level === lvl) return 0;
+  if(a.level === "all") return 1;
+  return 2;
+}
 function exploreResultsHTML(){
-  const filtered = exploreFiltered();
-  return `<div class="results-count">${esc(t('resultsFound', filtered.length))}</div>
+  const lvl = state.user ? myLevel() : null;
+  let filtered = exploreFiltered();
+  if(lvl && LEVEL_COL) filtered = filtered.map((a,i)=>({a,i})).sort((x,y)=>(levelScore(x.a,lvl)-levelScore(y.a,lvl)) || (x.i-y.i)).map(x=>x.a);
+  const hint = !LEVEL_COL || !state.user ? "" : lvl
+    ? `<div class="level-hint">${esc(t('myLevelSortHint'))} · <b>${esc(levelName(lvl))}</b></div>`
+    : `<div class="level-hint level-hint-link" onclick="go('profile')">${esc(t('myLevelSetHint'))}</div>`;
+  return `${hint}<div class="results-count">${esc(t('resultsFound', filtered.length))}</div>
     ${filtered.length===0 ? `
       <div class="empty-box">
         <div class="empty-emoji">🔍</div>
@@ -2511,6 +2580,7 @@ function pageProfile(){
         ${state.notifStatus === "denied" ? `<div style="font-size:11.5px; color:#F0B4AE; margin-top:8px;">${esc(t('notifBlockedHint'))}</div>` : ""}
       </div>
     </div>
+    ${myLevelHTML()}
     ${notifSportsHTML()}
     <div class="profile-stats">
       <div class="pstat"><div class="pstat-num">${hostedCount+joinedCount}</div><div class="pstat-label">${esc(t('statsActivities'))}</div></div>
